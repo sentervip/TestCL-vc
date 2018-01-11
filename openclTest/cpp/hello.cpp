@@ -11,7 +11,7 @@
 #define MEM_SIZE (128)
 #define MAX_SOURCE_SIZE (0x100000)
 
-int main()
+int main_hello()
 {
   cl_device_id device_id = NULL;
   cl_context context = NULL;
@@ -88,6 +88,7 @@ int main()
 
   free(source_str);
   std::cin >> ret;
+
   return 0;
 }
 

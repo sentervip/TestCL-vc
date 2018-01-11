@@ -117,9 +117,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="cpp\hello.cpp" />
+    <ClCompile Include="cpp\online.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="opencl\hello.cl" />
+    <None Include="opencl\online.cl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
