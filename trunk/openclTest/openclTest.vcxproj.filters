@@ -21,12 +21,42 @@
     <ClCompile Include="cpp\online.cpp">
       <Filter>cpp</Filter>
     </ClCompile>
+    <ClCompile Include="cpp\dataParallel.cpp">
+      <Filter>cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\taskParallel.cpp">
+      <Filter>cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\local.cpp">
+      <Filter>cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\image.cpp">
+      <Filter>cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\convolution.cpp">
+      <Filter>cpp</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="opencl\hello.cl">
       <Filter>cl</Filter>
     </None>
     <None Include="opencl\online.cl">
+      <Filter>cl</Filter>
+    </None>
+    <None Include="opencl\dataParallel.cl">
+      <Filter>cl</Filter>
+    </None>
+    <None Include="opencl\taskParallel.cl">
+      <Filter>cl</Filter>
+    </None>
+    <None Include="opencl\local.cl">
+      <Filter>cl</Filter>
+    </None>
+    <None Include="opencl\image.cl">
+      <Filter>cl</Filter>
+    </None>
+    <None Include="opencl\convolution.cl">
       <Filter>cl</Filter>
     </None>
   </ItemGroup>

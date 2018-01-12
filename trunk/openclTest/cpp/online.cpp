@@ -11,7 +11,7 @@
 #define MAX_SOURCE_SIZE (0x100000)
 
 int printDevInfo(cl_platform_id platform, cl_device_id device);
-int main()
+int main_online()
 {
 	cl_uint					numPlatforms;
 	cl_platform_id			platform;
