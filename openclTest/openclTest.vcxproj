@@ -116,12 +116,22 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="cpp\convolution.cpp" />
+    <ClCompile Include="cpp\dataParallel.cpp" />
     <ClCompile Include="cpp\hello.cpp" />
+    <ClCompile Include="cpp\image.cpp" />
+    <ClCompile Include="cpp\local.cpp" />
     <ClCompile Include="cpp\online.cpp" />
+    <ClCompile Include="cpp\taskParallel.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="opencl\convolution.cl" />
+    <None Include="opencl\dataParallel.cl" />
     <None Include="opencl\hello.cl" />
+    <None Include="opencl\image.cl" />
+    <None Include="opencl\local.cl" />
     <None Include="opencl\online.cl" />
+    <None Include="opencl\taskParallel.cl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
