@@ -13,7 +13,7 @@ extern "C" {
 
 #define  CL_FILE_NAME   "./HeterogeneousComputingwithOpenCL2.0,3'rd/Ch4/ImageConvolution/image-convolution.cl"
 	
-static const char* inputImagePath = "./HeterogeneousComputingwithOpenCL2.0,3'rd/Images/cat.bmp";
+	static const char* inputImagePath = "./HeterogeneousComputingwithOpenCL2.0,3'rd/Images/cat.bmp";
 static float gaussianBlurFilterFactor = 273.0f;
 static float gaussianBlurFilter[25] = {
 	   1.0f,  4.0f,  7.0f,  4.0f, 1.0f,
@@ -32,15 +32,15 @@ static float gaussianBlurFilter[25] = {
 		-1.0f, -1.0f, -1.0f, -1.0f, -1.0f };
 	static const int sharpenFilterWidth = 5;
 
-	static int edgeSharpenFilterFactor = 1.0f;
-	static int edgeSharpenFilter[9] = {
+	static float edgeSharpenFilterFactor = 1.0f;
+	static float edgeSharpenFilter[9] = {
 		1.0f,  1.0f, 1.0f,
 		1.0f, -7.0f, 1.0f,
 		1.0f,  1.0f, 1.0f };
 	static const int edgeSharpenFilterWidth = 3;
 
-	static int vertEdgeDetectFilterFactor = 1.0f;
-	static int vertEdgeDetectFilter[25] = {
+	static float vertEdgeDetectFilterFactor = 1.0f;
+	static float vertEdgeDetectFilter[25] = {
 		 0,  0, -1.0f,  0,  0,
 		 0,  0, -1.0f,  0,  0,
 		 0,  0,  4.0f,  0,  0,
@@ -75,8 +75,8 @@ static float gaussianBlurFilter[25] = {
 		cl_device_id device = NULL;
 		cl_context context = NULL;
 		cl_program program = NULL;
-		int *hInputImage = NULL;
-		int *hOutputImage = NULL;
+		float *hInputImage = NULL;
+		float *hOutputImage = NULL;
 		cl_mem inputImage, outputImage;
 		int passed = TRUE;
 		cl_sampler sampler;
@@ -140,7 +140,7 @@ static float gaussianBlurFilter[25] = {
 
 		// Create the images 
 		fmt.image_channel_order = CL_R;
-		fmt.image_channel_data_type = CL_SIGNED_INT32;
+		fmt.image_channel_data_type = CL_FLOAT;
 
 		memset(&desc, '\0', sizeof(cl_image_desc));
 		desc.image_type = CL_MEM_OBJECT_IMAGE2D;
@@ -151,25 +151,14 @@ static float gaussianBlurFilter[25] = {
 		desc.buffer = NULL; // or someBuf;
 		
 		// Create Image Object 
-		inputImage = clCreateImage(context    /* context */,
-			CL_MEM_READ_WRITE            /* flags */,
-			&fmt                      /* image_format */,
-			&desc			        /* image_desc */,
-			NULL                  /* host_ptr */,
-			&status                /* errcode_ret */);
+		inputImage = clCreateBuffer(context, CL_MEM_READ_WRITE, imageCols*imageRows * sizeof(float), NULL, &status);
 		check(status);
-		outputImage = clCreateImage(context,   
-			CL_MEM_READ_WRITE            /* flags */,
-			&fmt                      /* image_format */,
-			&desc			        /* image_desc */,
-			NULL                  /* host_ptr */,
-			&status                /* errcode_ret */);
+		outputImage = clCreateBuffer(context, CL_MEM_READ_WRITE, imageCols*imageRows * sizeof(float), NULL, &status);
 		check(status);
 
 		// Create a buffer for the filter 
 		cl_mem filterBuffer;
-		filterBuffer = clCreateBuffer(context, CL_MEM_READ_ONLY, filterWidth*filterWidth * sizeof(float), NULL,
-			&status);
+		filterBuffer = clCreateBuffer(context, CL_MEM_READ_ONLY, filterWidth*filterWidth * sizeof(float), NULL,&status);
 		check(status);
 
 		cl_command_queue cmdQueue;
@@ -178,39 +167,22 @@ static float gaussianBlurFilter[25] = {
 
 		//copy input data to the image,init queue's image
 		size_t origin[3] = {0,0,0};
-		size_t region[3] = { imageRows, imageCols,1};
-
-		status = clEnqueueWriteImage(cmdQueue    /* command_queue */,
-			inputImage              /* image */,
-			CL_TRUE             /* blocking_write */,
-			origin      /* origin[3] */,
-			region     /* region[3] */,
-			imageRows  *imageCols* sizeof(float)              /* input_row_pitch */,
-			0             /* input_slice_pitch */,
-			hInputImage        /* ptr */,
-			0             /* num_events_in_wait_list */,
-			NULL   /* event_wait_list */,
-			NULL          /* event */);
-
-		check(status);  
-		status = clEnqueueWriteImage(cmdQueue    /* command_queue */,
-			outputImage              /* image */,
-			CL_TRUE             /* blocking_write */,
-			origin      /* origin[3] */,
-			region     /* region[3] */,
-			imageRows * imageCols * sizeof(float)              /* input_row_pitch */,
-			0             /* input_slice_pitch */,
-			hOutputImage        /* ptr */,
-			NULL             /* num_events_in_wait_list */,
-			NULL   /* event_wait_list */,
-			NULL          /* event */) CL_API_SUFFIX__VERSION_1_0;
-		check(status);		
+		size_t region[3] = { imageRows, imageCols,1};	
 
 		//init queue's buf
+		status = clEnqueueWriteBuffer(cmdQueue, inputImage, CL_TRUE, 0, imageRows * imageCols * sizeof(float),
+			(void *)hInputImage, 0, NULL, NULL);
+		check(status);
+
+		status = clEnqueueWriteBuffer(cmdQueue, outputImage, CL_TRUE, 0, imageRows * imageCols * sizeof(float),
+			(void *)hOutputImage, 0, NULL, NULL);
+		check(status);
+
 		status = clEnqueueWriteBuffer(cmdQueue, filterBuffer, CL_TRUE, 0, filterWidth*filterWidth * sizeof(float),
 			(void *)filter, 0, NULL, NULL);
 		check(status);
 
+		//init sampler
 		sampler = clCreateSampler(context, CL_FALSE, CL_ADDRESS_CLAMP_TO_EDGE, CL_FILTER_NEAREST,&status);
 		check(status);
 		status = BuildKernel(&device, &context, &program, CL_FILE_NAME);
@@ -220,7 +192,7 @@ static float gaussianBlurFilter[25] = {
 		status |= clSetKernelArg(kernel, 1, sizeof(cl_mem), &outputImage);
 		status |= clSetKernelArg(kernel, 2, sizeof(cl_mem), &filterBuffer);
 		status |= clSetKernelArg(kernel, 3, sizeof(cl_int), &filterWidth);
-		status |= clSetKernelArg(kernel, 4, sizeof(cl_sampler), &sampler);
+		//status |= clSetKernelArg(kernel, 4, sizeof(cl_sampler), &sampler);
 		check(status);
 
 		// Define the index space and work-group size
@@ -230,24 +202,13 @@ static float gaussianBlurFilter[25] = {
 		status = clEnqueueNDRangeKernel(cmdQueue, kernel, 1, NULL, &globalWorkSize[0], &localWorkSize[0], 0, NULL, NULL);
 		check(status);
 
-		
-#if 0
-		// Execute the kernel
-		cl::NDRange global(imageCols, imageRows);
-		cl::NDRange local(8, 8);
-		queue.enqueueNDRangeKernel(kernel, cl::NullRange, global, local);
-
-		/* Copy the output data back to the host */
-		queue.enqueueReadImage(outputImage, CL_TRUE, origin, region, 0, 0,
-			hOutputImage);
-#endif
 		// Save the output bmp 
 		printf("Output image saved as: cat-filtered.bmp\n");
 		writeBmpFloat(hOutputImage, "cat-filtered.bmp", imageRows, imageCols,
 			inputImagePath);
 
 		/* Verify result */
-		int *refOutput = convolutionGoldFloat(hInputImage, imageRows, imageCols,
+		float *refOutput = convolutionGoldFloat(hInputImage, imageRows, imageCols,
 			filter, filterWidth);
 
 		for (i = 0; i < imageRows*imageCols; i++) {

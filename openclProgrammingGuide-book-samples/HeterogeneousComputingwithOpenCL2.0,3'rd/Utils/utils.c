@@ -20,7 +20,7 @@ void OpenCLInit(cl_platform_id *clPlatform, cl_device_id *clDevice, cl_context *
 	{
 		char pBuf[100];
 		clGetPlatformInfo(platforms[i], CL_PLATFORM_VERSION, sizeof(pBuf), pBuf, NULL);
-		printf("%s\n", pBuf);
+		printf("getPlat[%d]: %s\n",i, pBuf);
 		platform = platforms[i];
 		//break;  
 	}
