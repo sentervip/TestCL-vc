@@ -1,10 +1,10 @@
 __kernel
 void convolution(
-    __read_only image2d_t inputImage,
-   __write_only image2d_t outputImage,
-        __constant int* filter,
-                      int filterWidth,
-                sampler_t sampler)
+	__global          float* inputImage,
+	__global          float* outputImage,
+	__global          float* filter,
+	__global          int filterWidth)
+ //               sampler_t sampler)
 {
    /* Store each work-item’s unique row and column */
    int column = get_global_id(0);
@@ -39,13 +39,15 @@ void convolution(
           * stores the pixel in the ’x’ coordinate of the returned
           * vector. */
             int4 pixel;         
-         pixel = read_imagef(inputImage, sampler, coords);
-         sum.x += pixel.x * filter[filterIdx++];
+        // pixel = read_imagef(inputImage, sampler, coords);
+			pixel = inputImage[coords.x];
+            sum.x += pixel.x * filter[filterIdx++];
       }
    }
    
    /* Copy the data to the output image */
    coords.x = column;
    coords.y = row;
-   write_imagef(outputImage, coords, sum);
+   //write_imagef(outputImage, coords, sum);
+   outputImage[coords.x+coords.y*4] = sum[coords.x+ coords.y * 4];
 }
